@@ -311,7 +311,7 @@ kubectl apply -f pod-1.yml -n my-namespace
 
 ## 📝 Commit History
 
-| File | Commit Message | When |
+| File | Commit Message 
 |---|---|---|
 | `pod.yml` | Pod creation for 1 hr 
 | `ReplicaSet.yml` | ReplicaSet.yml 
