@@ -313,14 +313,14 @@ kubectl apply -f pod-1.yml -n my-namespace
 
 | File | Commit Message | When |
 |---|---|---|
-| `pod.yml` | Pod creation for 1 hr | 3 days ago |
-| `ReplicaSet.yml` | ReplicaSet.yml | 3 days ago |
-| `Deployment.yml` | Fix indentation in Deployment.yml | yesterday |
-| `ReplicaSet-1.yml` | Update ReplicaSet-1.yml | yesterday |
-| `ReplicaSet-2.yml` | Update ReplicaSet-2.yml | yesterday |
-| `pod-1.yml` | Add namespace definition to pod configuration | yesterday |
-| `DaemonSet.yml` | DaemonSet.yml | 1 hour ago |
-| `Job.yml` | Job.yml Execute the task and goes to completion state | 15 minutes ago |
+| `pod.yml` | Pod creation for 1 hr 
+| `ReplicaSet.yml` | ReplicaSet.yml 
+| `Deployment.yml` | Fix indentation in Deployment.yml 
+| `ReplicaSet-1.yml` | Update ReplicaSet-1.yml 
+| `ReplicaSet-2.yml` | Update ReplicaSet-2.yml 
+| `pod-1.yml` | Add namespace definition to pod configuration
+| `DaemonSet.yml` | DaemonSet.yml 
+| `Job.yml` | Job.yml Execute the task and goes to completion state 
 
 ---
 
