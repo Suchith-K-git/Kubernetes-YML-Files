@@ -14,9 +14,9 @@ Pods
 
 This setup uses:
 
-- Kubernetes (kubeadm)
-- AWS EC2
-- AWS Cloud Controller Manager
+* Kubernetes (kubeadm)
+* AWS EC2
+* AWS Cloud Controller Manager
 
 ---
 
@@ -24,17 +24,17 @@ This setup uses:
 
 You need:
 
-| Node | Example Name |
-|------|---------------|
-| Master | master-node |
-| Worker | worker-node |
+| Node   | Example Name |
+| ------ | ------------ |
+| Master | master-node  |
+| Worker | worker-node  |
 
 Both instances must:
 
-- Be in SAME VPC
-- Same subnet or routable subnet
-- Same security group (recommended)
-- Public IPv4 enabled
+* Be in SAME VPC
+* Same subnet or routable subnet
+* Same security group (recommended)
+* Public IPv4 enabled
 
 ---
 
@@ -42,17 +42,19 @@ Both instances must:
 
 Go to:
 
+```text
 AWS Console → EC2 → Security Groups
+```
 
 Add these inbound rules to BOTH instances:
 
-| Type | Port | Source |
-|------|------|---------|
-| SSH | 22 | Your IP |
-| HTTP | 80 | 0.0.0.0/0 |
-| HTTPS | 443 | 0.0.0.0/0 |
-| Custom TCP | 30000-32767 | 0.0.0.0/0 |
-| All Traffic | All | Same Security Group |
+| Type        | Port        | Source              |
+| ----------- | ----------- | ------------------- |
+| SSH         | 22          | Your IP             |
+| HTTP        | 80          | 0.0.0.0/0           |
+| HTTPS       | 443         | 0.0.0.0/0           |
+| Custom TCP  | 30000-32767 | 0.0.0.0/0           |
+| All Traffic | All         | Same Security Group |
 
 IMPORTANT:
 
@@ -64,15 +66,21 @@ IMPORTANT:
 
 Go to:
 
+```text
 AWS Console → IAM → Roles → Create Role
+```
 
 Trusted Entity:
 
-- EC2
+```text
+EC2
+```
 
 Attach Policy:
 
-- AdministratorAccess
+```text
+AdministratorAccess
+```
 
 Role Name:
 
@@ -90,13 +98,15 @@ AdministratorAccess is for learning/testing only.
 
 Go to:
 
+```text
 AWS Console → EC2 → Instances
+```
 
 For BOTH nodes:
 
-Actions
-→ Security
-→ Modify IAM Role
+```text
+Actions → Security → Modify IAM Role
+```
 
 Attach:
 
@@ -110,12 +120,14 @@ k8s-cloud-role
 
 Go to BOTH EC2 instances:
 
+```text
 Tags → Manage Tags
+```
 
 Add:
 
-| Key | Value |
-|-----|-------|
+| Key                                | Value |
+| ---------------------------------- | ----- |
 | kubernetes.io/cluster/demo-cluster | owned |
 
 IMPORTANT:
@@ -272,11 +284,37 @@ spec:
         command:
         - /bin/aws-cloud-controller-manager
         - --cloud-provider=aws
+        - --configure-cloud-routes=false
         - --cluster-name=demo-cluster
         - --v=2
 ```
 
-Apply:
+IMPORTANT:
+
+This line is mandatory:
+
+```yaml
+- --configure-cloud-routes=false
+```
+
+Why?
+
+Because Calico already manages Kubernetes pod networking.
+
+Without this flag:
+
+* AWS Cloud Controller Manager tries to manage pod routes
+* Calico also manages routes
+* Both conflict
+* Controller crashes
+
+Typical error:
+
+```text
+error running controllers: invalid CIDR[0]: <nil> (invalid CIDR address: )
+```
+
+Apply manifest:
 
 ```bash
 kubectl apply -f aws-cloud-controller-manager.yaml
@@ -418,10 +456,10 @@ EXTERNAL-IP   a1b2c3d4e5.us-east-1.elb.amazonaws.com
 
 AWS automatically creates:
 
-- ELB/NLB
-- Target Groups
-- Health Checks
-- Node Registration
+* ELB/NLB
+* Target Groups
+* Health Checks
+* Node Registration
 
 ---
 
@@ -451,15 +489,16 @@ Welcome to nginx!
 
 Go to:
 
-AWS Console
-→ EC2
-→ Load Balancers
+```text
+AWS Console → EC2 → Load Balancers
+```
 
 You should see:
 
-- AWS Load Balancer
-- Registered Targets
-- Health Checks
+* AWS Load Balancer
+* Registered Targets
+* Health Checks
+* Traffic Flow
 
 ---
 
@@ -519,29 +558,43 @@ kubectl logs -n kube-system -l k8s-app=aws-cloud-controller-manager
 
 Possible causes:
 
-- IAM role missing
-- Cluster tag missing
-- Controller not running
-- Wrong cloud-provider configuration
-- Security group issue
+* IAM role missing
+* Cluster tag missing
+* Controller not running
+* Wrong cloud-provider configuration
+* Security group issue
+
+## AWS Cloud Controller CrashLoopBackOff
+
+Possible causes:
+
+* Missing:
+
+```yaml
+--configure-cloud-routes=false
+```
+
+* Cluster tag mismatch
+* IAM role missing
+* Incorrect cloud-provider setting
 
 ---
 
 # Cleanup
 
-Delete Service:
+## Delete Service
 
 ```bash
 kubectl delete svc nginx-loadbalancer
 ```
 
-Delete Deployment:
+## Delete Deployment
 
 ```bash
 kubectl delete deployment nginx-deployment
 ```
 
-Delete Controller:
+## Delete Controller
 
 ```bash
 kubectl delete -f aws-cloud-controller-manager.yaml
@@ -553,32 +606,30 @@ kubectl delete -f aws-cloud-controller-manager.yaml
 
 For production Kubernetes on AWS, preferred setup is:
 
-- AWS Load Balancer Controller
-- NGINX Ingress Controller
+* AWS Load Balancer Controller
+* NGINX Ingress Controller
 
 Advantages:
 
-- ALB Support
-- HTTPS/SSL
-- Domain Routing
-- Path Routing
-- Autoscaling
-- WAF Integration
+* ALB Support
+* HTTPS/SSL
+* Domain Routing
+* Path Routing
+* Autoscaling
+* WAF Integration
 
 ---
 
 # Final Checklist
 
-| Item | Status |
-|------|--------|
-| Nodes Ready | ✅ |
-| IAM Role Attached | ✅ |
-| Cluster Tag Added | ✅ |
-| Cloud Provider Configured | ✅ |
-| Cloud Controller Running | ✅ |
-| NGINX Pods Running | ✅ |
-| LoadBalancer Created | ✅ |
-| EXTERNAL-IP Assigned | ✅ |
-| Application Accessible | ✅ |
-
----
+| Item                      | Status |
+| ------------------------- | ------ |
+| Nodes Ready               | ✅      |
+| IAM Role Attached         | ✅      |
+| Cluster Tag Added         | ✅      |
+| Cloud Provider Configured | ✅      |
+| Cloud Controller Running  | ✅      |
+| NGINX Pods Running        | ✅      |
+| LoadBalancer Created      | ✅      |
+| EXTERNAL-IP Assigned      | ✅      |
+| Application Accessible    | ✅      |
