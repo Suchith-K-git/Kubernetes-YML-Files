@@ -1,1 +1,22 @@
+kind: Job
+apiVersion: batch/v1
 
+metadata:
+  name: parallel-job
+
+spec:
+  completions: 3
+  parallelism: 3
+
+  template:
+    metadata:
+      labels:
+        app: parallel-task
+
+    spec:
+      containers:
+        - name: batch-container
+          image: busybox:latest
+          command: ["sh", "-c", "echo Good Morning && sleep 10"]
+
+      restartPolicy: Never
