@@ -22,6 +22,6 @@ spec:
           command:
             - sh
             - -c
-            - "echo Hello Dosto! && sleep 10"
+            - "echo Hello Students! && sleep 10"
 
       restartPolicy: Never
