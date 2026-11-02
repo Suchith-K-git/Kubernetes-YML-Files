@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 
@@ -18,7 +19,8 @@ spec:
 
     spec:
       containers:
-        - name: nginx
-          image: nginx
+        - name: nginx-container
+          image: nginx:latest
           ports:
             - containerPort: 80
+              protocol: TCP
